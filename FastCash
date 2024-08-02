@@ -1,0 +1,134 @@
+package bank;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.sql.ResultSet;
+import java.util.Date;
+
+import javax.swing.*;
+
+public class FastCash extends JFrame implements ActionListener {
+    JButton desposite, withDrawl, fast, miniStatemnet, pinchange, balanceEnquiry, back;
+
+    String pinNumber;
+
+    FastCash(String pinNumber) {
+        this.pinNumber = pinNumber;
+
+        setLayout(null); // D:\Java projects\bank.management.system\src\icons\atm.jpg
+        setUndecorated(true);
+        setVisible(true);
+        setSize(900, 900);
+        setLocation(370, 0);
+        getContentPane().setBackground(Color.WHITE);
+
+        ImageIcon i1 = new ImageIcon(ClassLoader.getSystemResource("icons/atm.jpg"));
+        Image l2 = i1.getImage().getScaledInstance(900, 900, Image.SCALE_DEFAULT);
+        ImageIcon i2 = new ImageIcon(l2);
+        JLabel image = new JLabel(i2);
+        image.setBounds(0, 0, 900, 900);
+        add(image);
+
+        JLabel text = new JLabel("Select Withdrawl Amount..");
+        text.setBounds(210, 300, 400, 20);
+        text.setForeground(Color.WHITE);
+        text.setFont(new Font("System", Font.BOLD, 17));
+        image.add(text);
+
+        desposite = new JButton("Rs 100");
+        desposite.setBounds(170, 350, 100, 30);
+        desposite.setForeground(Color.BLACK);
+        desposite.setBackground(Color.WHITE);
+        desposite.addActionListener(this);
+        image.add(desposite);
+
+        withDrawl = new JButton("Rs 500");
+        withDrawl.setBounds(340, 350, 130, 30);
+        withDrawl.setForeground(Color.BLACK);
+        withDrawl.setBackground(Color.WHITE);
+        withDrawl.addActionListener(this);
+        image.add(withDrawl);
+
+        fast = new JButton("Rs 1000");
+        fast.setBounds(170, 400, 100, 30);
+        fast.setForeground(Color.BLACK);
+        fast.setBackground(Color.WHITE);
+        fast.addActionListener(this);
+        image.add(fast);
+
+        miniStatemnet = new JButton("Rs 2000");
+        miniStatemnet.setBounds(340, 400, 130, 30);
+        miniStatemnet.setForeground(Color.BLACK);
+        miniStatemnet.setBackground(Color.WHITE);
+        miniStatemnet.addActionListener(this);
+        image.add(miniStatemnet);
+
+        pinchange = new JButton("Rs 5000 ");
+        pinchange.setBounds(170, 450, 110, 30);
+        pinchange.setForeground(Color.BLACK);
+        pinchange.setBackground(Color.WHITE);
+        pinchange.addActionListener(this);
+        image.add(pinchange);
+
+        balanceEnquiry = new JButton("Rs 10000");
+        balanceEnquiry.setBounds(340, 450, 130, 30);
+        balanceEnquiry.setForeground(Color.BLACK);
+        balanceEnquiry.setBackground(Color.WHITE);
+        balanceEnquiry.addActionListener(this);
+        image.add(balanceEnquiry);
+
+        back = new JButton("BACK");
+        back.setBounds(340, 500, 130, 30);
+        back.setForeground(Color.BLACK);
+        back.setBackground(Color.WHITE);
+        back.addActionListener(this);
+        image.add(back);
+
+    }
+
+    public void actionPerformed(ActionEvent a) {
+        if (a.getSource() == back) {
+            setVisible(false);
+            new Transcations(pinNumber).setVisible(true);
+        } else {
+            String amount = ((JButton) a.getSource()).getText().substring(3);
+            transferFocus();
+
+            conn c = new conn();
+
+            try {
+
+                ResultSet rs = c.s.executeQuery("select * from Bank where pinNumber='" + pinNumber + "'");
+                int balance = 0;
+                while (rs.next()) {
+                    if (rs.getString("type").equals("Deposit")) {
+                        balance += Integer.parseInt(rs.getString("amount"));
+                    } else {
+                        balance -= Integer.parseInt(rs.getString("amount"));
+                    }
+                }
+                if (a.getSource() != back && balance < Integer.parseInt(amount)) {
+                    JOptionPane.showMessageDialog(null, "Insufficent Balance");
+                    return;
+                }
+                Date date = new Date();
+                String query = "INSERT INTO Bank (pinNumber, date, type, amount) VALUES ('" + pinNumber + "', '" + date
+                        + "', 'withdraw', '" + amount + "')";
+
+                c.s.executeUpdate(query);
+                JOptionPane.showMessageDialog(null, "Rs" + amount + "Debited Sucessfully");
+
+                setVisible(false);
+                new Transcations(pinNumber).setVisible(true);
+
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        new FastCash("");
+    }
+
+}
