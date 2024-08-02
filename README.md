@@ -17,7 +17,7 @@ Database Connectivity: JDBC
 #Setup Instructions
 Clone the repository:
 sh
-git clone https://github.com/your-username/atm-simulator.git
+git clone https://github.com/sarvagna8696/ATM-Simulator.git
 cd atm-simulator
 
 #Setup the MySQL Database:
