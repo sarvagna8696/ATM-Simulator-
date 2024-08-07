@@ -4,126 +4,122 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.ResultSet;
-
 import javax.swing.*;
 
 public class Login extends JFrame implements ActionListener {
-
     JButton signin, clear, signup;
     JTextField cardTextField;
     JPasswordField PinTextField;
-
+    
     Login() {
-
-        setLayout(null);
+        setTitle("AUTOMATED TELLER MACHINE");
         setSize(800, 500);
-        setVisible(true);
-        setLocation(400, 200);
-        setTitle("AUTOMATED TELLER MACHINE ");
-
-        // Image
-        ImageIcon lo = new ImageIcon(
-                ClassLoader.getSystemResource("icons/logo.jpg"));
-        Image lo2 = lo.getImage().getScaledInstance(100, 100, Image.SCALE_DEFAULT);
+        setLocationRelativeTo(null); // Center the frame
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        
+        // Set up constraints
+        gbc.insets = new Insets(10, 10, 10, 10); // Padding
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        
+        // Logo
+        ImageIcon lo = new ImageIcon(ClassLoader.getSystemResource("icons/logo.jpg"));
+        Image lo2 = lo.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
         ImageIcon lo3 = new ImageIcon(lo2);
-
         JLabel label = new JLabel(lo3);
-        label.setBounds(70, 20, 100, 100);
-        add(label);
-
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        add(label, gbc);
+        
+        // Welcome text
         JLabel Text = new JLabel("Welcome to ATM");
         Text.setFont(new Font("Osward", Font.BOLD, 38));
-        Text.setBounds(200, 40, 400, 40);
-        add(Text);
-
-        JLabel Cardno = new JLabel(" Card No :");
+        gbc.gridy = 1;
+        gbc.gridwidth = 2;
+        add(Text, gbc);
+        
+        // Card number
+        JLabel Cardno = new JLabel("Card No:");
         Cardno.setFont(new Font("Raleway", Font.BOLD, 28));
-        Cardno.setBounds(110, 150, 150, 30);
-        add(Cardno);
-
+        gbc.gridy = 2;
+        gbc.gridwidth = 1;
+        add(Cardno, gbc);
+        
         cardTextField = new JTextField();
-        cardTextField.setBounds(280, 150, 250, 30);
-        add(cardTextField);
-
-        JLabel Pin = new JLabel("PIN :");
+        gbc.gridx = 1;
+        add(cardTextField, gbc);
+        
+        // PIN
+        JLabel Pin = new JLabel("PIN:");
         Pin.setFont(new Font("Raleway", Font.BOLD, 28));
-        Pin.setBounds(120, 220, 150, 30);
-        add(Pin);
-
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        add(Pin, gbc);
+        
         PinTextField = new JPasswordField();
-        PinTextField.setBounds(280, 220, 250, 30);
-        add(PinTextField);
-
+        gbc.gridx = 1;
+        add(PinTextField, gbc);
+        
+        // Sign in button
         signin = new JButton("SIGN IN");
-        signin.setBounds(280, 300, 100, 30);
         signin.setBackground(Color.BLACK);
         signin.setForeground(Color.WHITE);
         signin.addActionListener(this);
-        add(signin);
-
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.gridwidth = 1;
+        add(signin, gbc);
+        
+        // Clear button
         clear = new JButton("CLEAR");
-        clear.setBounds(430, 300, 100, 30);
         clear.setBackground(Color.BLACK);
         clear.setForeground(Color.WHITE);
         clear.addActionListener(this);
-        add(clear);
-
+        gbc.gridx = 1;
+        add(clear, gbc);
+        
+        // Sign up button
         signup = new JButton("SIGN UP");
-        signup.setBounds(280, 380, 250, 30);
         signup.setBackground(Color.BLACK);
         signup.setForeground(Color.WHITE);
         signup.addActionListener(this);
-        add(signup);
-
+        gbc.gridy = 5;
+        gbc.gridwidth = 2;
+        add(signup, gbc);
+        
         getContentPane().setBackground(Color.WHITE);
-
     }
-
+    
     @Override
     public void actionPerformed(ActionEvent e) {
-
         if (e.getSource() == clear) {
-
             cardTextField.setText("");
             PinTextField.setText("");
-
         } else if (e.getSource() == signin) {
-
             conn c = new conn();
             String cardNumber = cardTextField.getText();
-            String pinNumber = PinTextField.getText();
+            String pinNumber = new String(PinTextField.getPassword()); // Use getPassword() for security
             String Q = "select * from login where CardNumber='" + cardNumber + "' and  PinNumber='" + pinNumber + "' ";
-
             try {
                 ResultSet rs = c.s.executeQuery(Q);
                 if (rs.next()) {
-                   
                     setVisible(false);
                     new Transcations(pinNumber).setVisible(true);
-                    System.out.println(pinNumber);
-
-                   
-
                 } else {
                     JOptionPane.showMessageDialog(null, "Incorrect Card Number or Pin");
                 }
-
             } catch (Exception t) {
-                System.out.println(t);
+                JOptionPane.showMessageDialog(null, "Error: " + t.getMessage());
             }
-
         } else if (e.getSource() == signup) {
-
             setVisible(false);
             new signupOne().setVisible(true);
-
         }
-
     }
-
-    public static void main(String[] args) throws Exception {
-        System.out.println("Hello, World!");
-        new Login();
-
+    
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new Login().setVisible(true));
     }
 }
